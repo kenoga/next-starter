@@ -65,17 +65,36 @@ Easily deploy your Next.js app with <a href="https://vercel.com/">Vercel</a> by 
 npm install
 ```
 
-### 3. Set up environment variables
+### 3. Set up PostgreSQL database
+You can use Docker Compose to run a local PostgreSQL server:
+
+```bash
+docker-compose up -d
+```
+
+This will start a PostgreSQL server with the following configuration:
+- Server: `localhost:5432`
+- Username: `postgres`
+- Password: `postgres`
+- Database: `nextjs`
+- Connection URL: `postgresql://postgres:postgres@localhost:5432/nextjs`
+
+### 4. Set up environment variables
 Create `.env` file and set env variables from `.env.example` file.
 
-### 4. Prepare husky
+### 5. Run Prisma migrations
+```bash
+npx prisma migrate dev
+```
+
+### 6. Prepare husky
 It is required if you want husky to work
 
 ```bash
 npm run prepare
 ```
 
-### 5. Run the dev server
+### 7. Run the dev server
 
 You can start the server using this command:
 
