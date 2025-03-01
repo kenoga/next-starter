@@ -1,9 +1,10 @@
-import type { NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
+// ミドルウェア機能を削除しました
+// 代わりにPage.tsxファイル内で直接認証チェックを行います
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function middleware(_request: NextRequest) {
-  // Middleware functionality removed
-  return;
+  return NextResponse.next();
 }
 
 export const config = {

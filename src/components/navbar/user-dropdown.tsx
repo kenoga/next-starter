@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { Session } from 'next-auth';
 import { signOut } from 'next-auth/react';
 
@@ -41,8 +42,14 @@ export const UserDropdown = ({ session: { user } }: { session: Session }) => {
           <h2 className="py-2 text-lg font-bold">{user?.name}</h2>
         </div>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/mypage">
+            <Icons.user className="mr-2 size-4" />
+            <span>{messages.profile}</span>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => signOut()}>
-          <Icons.logOut className="mr-2 size-4" />{' '}
+          <Icons.logOut className="mr-2 size-4" />
           <span>{messages.sign_out}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
