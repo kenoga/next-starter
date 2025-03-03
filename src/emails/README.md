@@ -20,13 +20,43 @@
 
 ## テンプレートのプレビュー
 
-React Emailには開発サーバー機能があり、作成したメールテンプレートを
-ブラウザでプレビューすることができます。この機能を使用するには、
-[React Email公式ドキュメント](https://react.email/docs/cli-reference/email-dev)を参照してください。
+開発サーバーでメールテンプレートをプレビューする方法：
 
+```bash
+# プロジェクトルートで実行
+npm run email:dev
 ```
-npx email dev
+
+これにより http://localhost:3000 でプレビューサーバーが起動します。
+`src/emails/preview/` 内の各ファイルがプレビューとして表示されます。
+
+新しいテンプレートを追加する際は、同時に対応するプレビューファイルも作成してください：
+
+```tsx
+// src/emails/preview/welcome.tsx の例
+import { WelcomeEmail } from '../welcome-email';
+
+export default function WelcomePreview() {
+  return (
+    <WelcomeEmail
+      name="山田太郎"
+      loginUrl="https://example.com/login"
+    />
+  );
+}
 ```
+
+## 実装の詳細
+
+1. **コンポーネント**: `@react-email/components` は、メール互換性の高いReactコンポーネントを提供
+2. **レンダリング**: `@react-email/render` の `render()` 関数でHTMLに変換
+3. **送信**: 生成されたHTMLを SendGrid APIで送信
+
+## セキュリティとベストプラクティス
+
+- テンプレートにユーザー入力を含める場合は、XSS攻撃を防ぐためにサニタイズしてください
+- 機密情報やトークンの有効期限を設定し、メール内のリンクには短い有効期限を設定してください
+- 大量のメール送信は、バッチ処理やキューを使用して行ってください
 
 ## 利用可能なテンプレート
 

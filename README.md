@@ -16,8 +16,11 @@
 - 📘 Typescript
 - 🎨 TailwindCSS - Class sorting, merging and linting
 - 🛠️ Shadcn/ui - Customizable UI components
-- 💵 Stripe - Payment handler
-- 🔒 Next-auth - Easy authentication library for Next.js (GitHub provider)
+- 📧 React Email - Beautiful email templates with React
+- 📮 SendGrid - Email delivery service
+- 👑 Admin system - Role-based access control and admin panel
+- 📨 Invitation system - Invite users with custom roles
+- 🔒 Next-auth - Easy authentication library for Next.js with Auth0
 - 🛡️ Prisma - ORM for node.js
 - 📋 React-hook-form - Manage your forms easy and efficient 
 - 🔍 Zod - Schema validation library
@@ -82,6 +85,14 @@ This will start a PostgreSQL server with the following configuration:
 ### 4. Set up environment variables
 Create `.env` file and set env variables from `.env.example` file.
 
+Required variables for all features:
+- `DATABASE_URL`: PostgreSQL connection string
+- `AUTH0_CLIENT_ID`: Auth0 client ID
+- `AUTH0_CLIENT_SECRET`: Auth0 client secret
+- `AUTH0_ISSUER`: Auth0 issuer URL (for Auth0 Management API)
+- `SENDGRID_API_KEY`: SendGrid API key (for sending invitation emails)
+- `SENDGRID_FROM_EMAIL`: Verified sender email for SendGrid
+
 ### 5. Run Prisma migrations
 ```bash
 npx prisma migrate dev
@@ -116,9 +127,20 @@ and open http://localhost:3000/ to see this app.
     ├── __tests__                   # Unit and e2e tests
     ├── actions                     # Server actions
     ├── app                         # Next JS App (App Router)
+    │   ├── admin/                  # Admin pages
+    │   ├── api/                    # API routes
+    │   └── invite/                 # User invitation pages
     ├── components                  # React components
+    │   ├── admin/                  # Admin panel components
+    │   └── ui/                     # Shadcn UI components
+    ├── emails                      # React Email templates
+    │   └── preview/                # Email preview components
     ├── hooks                       # Custom hooks
     ├── lib                         # Functions and utilities
+    │   ├── auth.ts                 # Authentication utilities
+    │   ├── auth0.ts                # Auth0 Management API
+    │   ├── invitations.ts          # Invitation system
+    │   └── mail.ts                 # Email functionality
     ├── styles                      # Styles folder
     ├── types                       # Type definitions
     ├── messages                    # Messages for i18n 
@@ -141,6 +163,7 @@ The following scripts are available in the `package.json`:
 - `test:watch`: Run unit tests in watch mode
 - `e2e`: Run end-to-end tests
 - `e2e:ui`: Run end-to-end tests with UI
+- `email:dev`: Start email template preview server
 - `postbuild`: Generate sitemap
 - `prepare`: Install Husky for managing Git hooks
 
