@@ -11,10 +11,11 @@ export const env = createEnv({
     AUTH0_CLIENT_ID: z.string().min(1),
     AUTH0_CLIENT_SECRET: z.string().min(1),
     AUTH0_ISSUER: z.string().url(),
-    PORT: z.string().default("3055"),
+    SENDGRID_API_KEY: z.string().min(1),
+    SENDGRID_FROM_EMAIL: z.string().email(),
+    PORT: z.string().default('3055'),
   },
-  client: {
-  },
+  client: {},
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     APP_URL: process.env.APP_URL,
@@ -24,6 +25,8 @@ export const env = createEnv({
     AUTH0_CLIENT_ID: process.env.AUTH0_CLIENT_ID,
     AUTH0_CLIENT_SECRET: process.env.AUTH0_CLIENT_SECRET,
     AUTH0_ISSUER: process.env.AUTH0_ISSUER,
+    SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
+    SENDGRID_FROM_EMAIL: process.env.SENDGRID_FROM_EMAIL,
     PORT: process.env.PORT,
   },
 });

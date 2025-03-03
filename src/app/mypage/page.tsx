@@ -1,13 +1,16 @@
 import { format } from 'date-fns';
 import Image from 'next/image';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { auth } from '@/app/api/auth/[...nextauth]/auth-options';
 import { Icons } from '@/components/icons';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -72,7 +75,14 @@ export default async function MyPage() {
               <p className="text-muted-foreground text-sm font-medium">
                 ロール
               </p>
-              <p className="capitalize">{user.role || 'ユーザー'}</p>
+              <div className="flex items-center gap-2">
+                <p className="capitalize">{user.role || 'ユーザー'}</p>
+                {user.role === 'admin' && (
+                  <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                    管理者
+                  </span>
+                )}
+              </div>
             </div>
             <div>
               <p className="text-muted-foreground text-sm font-medium">
@@ -81,6 +91,19 @@ export default async function MyPage() {
               <p>{format(user.createdAt, 'yyyy年MM月dd日')}</p>
             </div>
           </CardContent>
+          {user.role === 'admin' && (
+            <CardFooter>
+              <Button asChild className="w-full">
+                <Link
+                  href="/admin"
+                  className="flex items-center justify-center gap-2"
+                >
+                  <Icons.users className="size-4" />
+                  管理者パネルへ
+                </Link>
+              </Button>
+            </CardFooter>
+          )}
         </Card>
 
         {/* アカウント設定 */}
