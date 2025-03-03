@@ -16,7 +16,8 @@
     "test:watch": "jest --watchAll",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
-    "prepare": "husky"
+    "prepare": "husky",
+    "email:dev": "email dev src/emails/preview"
   },
   "husky": {
     "hooks": {
@@ -39,6 +40,8 @@
     "@radix-ui/react-select": "^2.1.6",
     "@radix-ui/react-slot": "^1.1.2",
     "@radix-ui/react-toast": "^1.2.4",
+    "@react-email/components": "^0.0.33",
+    "@react-email/render": "^1.0.5",
     "@sendgrid/mail": "^8.1.4",
     "@t3-oss/env-nextjs": "^0.11.1",
     "class-variance-authority": "^0.7.1",
@@ -51,6 +54,7 @@
     "next-themes": "^0.4.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-email": "^3.0.7",
     "react-hook-form": "^7.54.2",
     "tailwind-merge": "^2.6.0",
     "zod": "^3.24.1"

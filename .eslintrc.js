@@ -22,6 +22,7 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/no-require-imports': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
+    'jsx-a11y/aria-role': 'off', // React Emailのための一時的な無効化
     'simple-import-sort/imports': [
       2,
       {
