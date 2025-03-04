@@ -14,13 +14,17 @@ import {
 
 import { env } from '@/env.mjs';
 
-interface InvitationEmailProps {
-  inviteUrl: string;
-  role: string;
+interface PasswordResetEmailProps {
+  resetUrl: string;
+  userName?: string;
 }
 
-export const InvitationEmail = ({ inviteUrl }: InvitationEmailProps) => {
-  const previewText = `${env.NEXT_PUBLIC_APP_NAME}へのご招待`;
+export const PasswordResetEmail = ({
+  resetUrl,
+  userName,
+}: PasswordResetEmailProps) => {
+  const previewText = `【${env.NEXT_PUBLIC_APP_NAME}】パスワード設定のご案内`;
+  const greeting = userName ? `${userName} 様` : 'お客様';
 
   return (
     <Html>
@@ -30,13 +34,14 @@ export const InvitationEmail = ({ inviteUrl }: InvitationEmailProps) => {
         <Container style={container}>
           <Heading
             style={h1}
-          >{`${env.NEXT_PUBLIC_APP_NAME}へのご招待`}</Heading>
-          <Text
-            style={text}
-          >{`このたびは ${env.NEXT_PUBLIC_APP_NAME} へご招待いたします。`}</Text>
-          <Text style={text}>あなたはサービスにご招待されました。</Text>
+          >{`${env.NEXT_PUBLIC_APP_NAME}パスワード設定のご案内`}</Heading>
+          <Text style={text}>{greeting}</Text>
           <Text style={text}>
-            下記リンクをクリックして招待を承認してください：
+            {env.NEXT_PUBLIC_APP_NAME}
+            をご利用いただきありがとうございます。パスワードの設定をお願いいたします。
+          </Text>
+          <Text style={text}>
+            下記のボタンをクリックして、パスワードを設定してください：
           </Text>
           <Section style={buttonContainer}>
             <Button
@@ -47,12 +52,17 @@ export const InvitationEmail = ({ inviteUrl }: InvitationEmailProps) => {
                 paddingTop: '12px',
                 paddingBottom: '12px',
               }}
-              href={inviteUrl}
+              href={resetUrl}
             >
-              招待を承認する
+              パスワードを設定する
             </Button>
           </Section>
-          <Text style={text}>このリンクは48時間有効です。</Text>
+          <Text style={text}>
+            このリンクは24時間有効です。パスワード設定後は自動的にログイン画面に移動します。
+          </Text>
+          <Text style={text}>
+            このメールに心当たりがない場合は、このメールを無視していただくか、サポートまでご連絡ください。
+          </Text>
           <Hr style={hr} />
           <Text style={footer}>
             ※このメールは送信専用です。返信いただいてもお答えできませんのでご了承ください。
@@ -63,7 +73,7 @@ export const InvitationEmail = ({ inviteUrl }: InvitationEmailProps) => {
   );
 };
 
-export default InvitationEmail;
+export default PasswordResetEmail;
 
 const main = {
   backgroundColor: '#f6f9fc',

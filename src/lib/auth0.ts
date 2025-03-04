@@ -28,6 +28,10 @@ interface Auth0User {
   user_metadata?: Record<string, unknown>;
 }
 
+interface PasswordChangeTicket {
+  ticket: string;
+}
+
 let cachedToken: Auth0Token | null = null;
 let tokenExpiresAt: number = 0;
 
@@ -153,4 +157,49 @@ export async function assignRoleToUser(
   if (!response.ok) {
     throw new Error('Failed to assign role to user');
   }
+}
+
+/**
+ * パスワード変更用のチケットを生成する
+ * @param userId Auth0のユーザーID
+ * @param resultUrl パスワード変更後のリダイレクト先URL（未指定時はログインページ）
+ * @returns パスワード変更用のチケットURL
+ */
+export async function generatePasswordChangeTicket(
+  userId: string,
+  resultUrl?: string
+): Promise<string> {
+  const token = await getManagementToken();
+  const domain = env.AUTH0_ISSUER.replace('https://', '');
+
+  // デフォルトはログインページへリダイレクト
+  const defaultResultUrl = `${env.APP_URL}/`;
+  const payload: Record<string, string | number | boolean> = {
+    user_id: userId,
+    ttl_sec: 86400, // 24時間有効
+    result_url: resultUrl || defaultResultUrl,
+    includeEmailInRedirect: true,
+  };
+
+  const response = await fetch(
+    `https://${domain}/api/v2/tickets/password-change`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(
+      `Failed to generate password change ticket: ${JSON.stringify(error)}`
+    );
+  }
+
+  const data = (await response.json()) as PasswordChangeTicket;
+  return data.ticket;
 }

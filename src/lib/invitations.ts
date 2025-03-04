@@ -1,6 +1,8 @@
 import { randomBytes } from 'crypto';
 import { addDays, isPast } from 'date-fns';
 
+import { sendPasswordSetupEmail } from './users';
+
 import { env } from '@/env.mjs';
 import { createAuth0User, userExistsByEmail } from '@/lib/auth0';
 import { sendInvitationEmail } from '@/lib/mail';
@@ -121,18 +123,19 @@ export async function acceptInvitation(
 
   try {
     // Auth0ユーザーの作成
-    await createAuth0User(invitation.email, invitation.role);
+    const auth0User = await createAuth0User(invitation.email, invitation.role);
 
     // トランザクションでローカルデータベースの操作を実行
     // これにより、すべての操作が成功するか、すべての操作が失敗するかのどちらかになる
-    await prisma.$transaction(async (tx) => {
+    const user = await prisma.$transaction(async (tx) => {
       // ローカルデータベースにユーザーを作成
-      await tx.user.create({
+      const newUser = await tx.user.create({
         data: {
           name: invitation.email.split('@')[0], // 仮の表示名（メールアドレスの@前の部分）
           email: invitation.email,
           emailVerified: new Date(), // メール検証済みとしてマーク
           role: invitation.role,
+          auth0Id: auth0User.user_id, // Auth0のIDを保存
         },
       });
 
@@ -141,7 +144,16 @@ export async function acceptInvitation(
         where: { id: invitation.id },
         data: { used: true },
       });
+
+      return newUser;
     });
+
+    // ユーザー作成後、パスワード設定メールを送信
+    await sendPasswordSetupEmail(
+      auth0User.user_id,
+      invitation.email,
+      user.name || undefined
+    );
 
     return {
       success: true,

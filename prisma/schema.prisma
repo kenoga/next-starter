@@ -44,6 +44,7 @@ model User {
   emailVerified    DateTime?
   image            String?
   role             String?   @default("user")
+  auth0Id          String?   @unique
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   accounts         Account[]

@@ -1,6 +1,8 @@
 import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
 
+import PasswordSetupButton from './password-button';
+
 import { requireAdmin } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
@@ -58,6 +60,7 @@ export default async function AdminUsersPage() {
               <th className="p-3 text-left font-medium">権限</th>
               <th className="p-3 text-left font-medium">登録日</th>
               <th className="p-3 text-left font-medium">最終更新</th>
+              <th className="p-3 text-left font-medium">アクション</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -93,6 +96,9 @@ export default async function AdminUsersPage() {
                 </td>
                 <td className="p-3 text-sm">{user.createdAtFormatted}</td>
                 <td className="p-3 text-sm">{user.updatedAtFormatted}</td>
+                <td className="p-3">
+                  <PasswordSetupButton userId={user.id} />
+                </td>
               </tr>
             ))}
           </tbody>

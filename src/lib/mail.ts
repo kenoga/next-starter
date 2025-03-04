@@ -2,6 +2,7 @@ import { render } from '@react-email/render';
 import sgMail from '@sendgrid/mail';
 
 import InvitationEmail from '@/emails/invitation-email';
+import PasswordResetEmail from '@/emails/password-reset-email';
 import { env } from '@/env.mjs';
 
 // SendGridのAPIキーを設定（メール送信スキップが有効でない場合のみ）
@@ -60,6 +61,22 @@ export async function sendInvitationEmail(
 
   // React EmailコンポーネントをレンダリングしてHTML文字列に変換
   const emailHtml = await render(InvitationEmail({ inviteUrl, role }));
+
+  return sendMail({ to: email, subject, html: emailHtml });
+}
+
+/**
+ * パスワードリセット/初期設定メールを送信する
+ */
+export async function sendPasswordResetEmail(
+  email: string,
+  resetUrl: string,
+  userName?: string
+): Promise<void> {
+  const subject = `【${env.APP_NAME}】パスワード設定のご案内`;
+
+  // React EmailコンポーネントをレンダリングしてHTML文字列に変換
+  const emailHtml = await render(PasswordResetEmail({ resetUrl, userName }));
 
   return sendMail({ to: email, subject, html: emailHtml });
 }
