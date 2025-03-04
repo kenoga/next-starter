@@ -5,8 +5,6 @@ import type { Metadata } from 'next';
 
 import { Footer } from '@/components/footer';
 import { Navbar } from '@/components/navbar/navbar';
-import { ThemeProvider } from '@/components/theme-provider';
-import { ThemeSwitcher } from '@/components/theme-switcher';
 import { Toaster } from '@/components/ui/toaster';
 import { siteConfig } from '@/lib/constant';
 import { fonts } from '@/lib/fonts';
@@ -48,15 +46,12 @@ export const generateMetadata = (): Metadata => ({
 
 const RootLayout = ({ children }: PropsWithChildren) => {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={cn('min-h-screen font-sans', fonts)}>
-        <ThemeProvider attribute="class">
-          <Navbar />
-          {children}
-          <ThemeSwitcher className="absolute bottom-5 right-5 z-10" />
-          <Footer />
-          <Toaster />
-        </ThemeProvider>
+        <Navbar />
+        {children}
+        <Footer />
+        <Toaster />
       </body>
     </html>
   );

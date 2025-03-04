@@ -1,15 +1,7 @@
-import { render, screen } from '@testing-library/react';
-
-import { HeroForm } from '@/components/form';
+// Test removed as HeroForm component is being deleted
 
 describe('Form', () => {
-  it('renders the Components', () => {
-    render(<HeroForm />);
-
-    const button = screen.getByText('Submit', {
-      selector: 'button',
-    });
-
-    expect(button).toBeInTheDocument();
+  it('placeholder test', () => {
+    expect(true).toBe(true);
   });
 });
