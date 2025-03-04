@@ -16,10 +16,10 @@ export async function sendPasswordSetupEmail(
   name?: string
 ): Promise<void> {
   try {
-    // Auth0からパスワード変更URLを取得（パスワード設定後はAuth0のユニバーサルログインページへリダイレクト）
-    // Auth0のログインページURL形式で明示的にリダイレクト先を指定
-    const domain = env.AUTH0_ISSUER.replace('https://', '');
-    const resultUrl = `https://${domain}/authorize?client_id=${env.AUTH0_CLIENT_ID}&redirect_uri=${encodeURIComponent(env.APP_URL)}&response_type=code&scope=openid%20profile%20email`;
+    // Auth0からパスワード変更URLを取得
+    // パスワード設定後は自動的にAuth0のログインフローに移行するようにする
+    // result_urlはAuth0に登録されたアプリケーションのURLである必要がある
+    const resultUrl = `${env.APP_URL}/`;
     const resetUrl = await generatePasswordChangeTicket(userId, resultUrl);
 
     console.log('Password reset URL:', resetUrl);
