@@ -1,5 +1,6 @@
 import {
   Check,
+  Copy,
   Loader2,
   LogOut,
   LucideProps,
@@ -26,6 +27,7 @@ export const Icons = {
   check: Check,
   close: X,
   trash: Trash,
+  copy: Copy,
   github: (props: LucideProps) => (
     <svg viewBox="0 0 438.549 438.549" {...props}>
       <path

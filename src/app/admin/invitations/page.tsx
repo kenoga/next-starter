@@ -1,45 +1,112 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { redirect } from 'next/navigation';
 
 import { InvitationsTable } from '@/components/admin/invitations-table';
 import { InviteUserForm } from '@/components/admin/invite-user-form';
-import { requireAdmin } from '@/lib/auth';
-import prisma from '@/lib/prisma';
 
-export default async function AdminInvitationsPage() {
-  // 管理者権限チェック
-  const auth = await requireAdmin();
+interface Invitation {
+  id: string;
+  email: string;
+  role: string;
+  expires: Date;
+  used: boolean;
+  createdAt: Date;
+  invitedBy: string;
+  expiresFormatted: string;
+  createdAtFormatted: string;
+  inviterName: string;
+  inviterEmail: string;
+  inviteUrl: string; // 招待リンクを追加
+}
 
-  // 管理者以外はアクセス不可
-  if (!auth.isAllowed) {
-    redirect('/');
-  }
+export default function AdminInvitationsPage() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
 
-  // 招待リストの取得
-  const invitations = await prisma.invitation.findMany({
-    orderBy: { createdAt: 'desc' },
-  });
+  // 招待リストを取得する関数
+  const fetchInvitations = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/admin/invitations');
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          setIsAuthorized(false);
+          return;
+        }
+        throw new Error('招待リストの取得に失敗しました');
+      }
 
-  // 招待ユーザーごとに招待者の情報を取得
-  const invitationsWithInviter = await Promise.all(
-    invitations.map(async (invitation) => {
-      const inviter = await prisma.user.findUnique({
-        where: { id: invitation.invitedBy },
-        select: { name: true, email: true },
-      });
+      const data = await response.json();
 
-      return {
+      // 日付のフォーマットと招待者の情報を追加
+      const formattedInvitations = data.map((invitation: any) => ({
         ...invitation,
-        expiresFormatted: format(invitation.expires, 'yyyy年MM月dd日 HH:mm'),
-        createdAtFormatted: format(
-          invitation.createdAt,
+        expires: new Date(invitation.expires),
+        createdAt: new Date(invitation.createdAt),
+        expiresFormatted: format(
+          new Date(invitation.expires),
           'yyyy年MM月dd日 HH:mm'
         ),
-        inviterName: inviter?.name || '',
-        inviterEmail: inviter?.email || '',
-      };
-    })
-  );
+        createdAtFormatted: format(
+          new Date(invitation.createdAt),
+          'yyyy年MM月dd日 HH:mm'
+        ),
+        inviterName: invitation.inviterName || '',
+        inviterEmail: invitation.inviterEmail || '',
+      }));
+
+      setInvitations(formattedInvitations);
+      setIsAuthorized(true);
+    } catch (error) {
+      console.error('Error fetching invitations:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 招待追加後のコールバック
+  const handleInvitationCreated = () => {
+    fetchInvitations();
+  };
+
+  // 招待削除後のコールバック
+  const handleInvitationDeleted = (deletedId: string) => {
+    setInvitations((currentInvitations) =>
+      currentInvitations.filter((inv) => inv.id !== deletedId)
+    );
+  };
+
+  // コンポーネント初期化時に招待リストを取得
+  useEffect(() => {
+    fetchInvitations();
+  }, []);
+
+  // 権限がない場合はホームにリダイレクト
+  useEffect(() => {
+    if (!isLoading && !isAuthorized) {
+      redirect('/');
+    }
+  }, [isLoading, isAuthorized]);
+
+  // ローディング中
+  if (isLoading) {
+    return (
+      <main className="container py-8">
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="mb-4 flex justify-center">
+              <div className="border-primary size-8 animate-spin rounded-full border-y-2"></div>
+            </div>
+            <p>データを読み込んでいます...</p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="container py-8">
@@ -52,11 +119,14 @@ export default async function AdminInvitationsPage() {
 
       <div className="grid gap-8 md:grid-cols-3">
         <div className="md:col-span-1">
-          <InviteUserForm />
+          <InviteUserForm onInvitationCreated={handleInvitationCreated} />
         </div>
 
         <div className="md:col-span-2">
-          <InvitationsTable invitations={invitationsWithInviter} />
+          <InvitationsTable
+            invitations={invitations}
+            onInvitationDeleted={handleInvitationDeleted}
+          />
         </div>
       </div>
     </main>

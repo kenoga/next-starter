@@ -37,15 +37,46 @@ interface Invitation {
   createdAtFormatted: string;
   inviterName: string;
   inviterEmail: string;
+  inviteUrl: string; // 招待リンク
 }
 
 interface InvitationsTableProps {
   invitations: Invitation[];
+  onInvitationDeleted?: (id: string) => void;
 }
 
-export function InvitationsTable({ invitations }: InvitationsTableProps) {
+export function InvitationsTable({
+  invitations,
+  onInvitationDeleted,
+}: InvitationsTableProps) {
   const [pendingDeletion, setPendingDeletion] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
+
+  // 招待リンクをクリップボードにコピーする
+  const copyInviteLink = (url: string, id: string) => {
+    navigator.clipboard
+      .writeText(url)
+      .then(() => {
+        // コピー成功時の視覚的フィードバック (アイコン変更)
+        setCopiedLinkId(id);
+        setTimeout(() => setCopiedLinkId(null), 3000);
+
+        toast({
+          title: 'リンクをコピーしました',
+          description: '招待リンクがクリップボードにコピーされました',
+          duration: 3000,
+        });
+      })
+      .catch(() => {
+        toast({
+          variant: 'destructive',
+          title: 'コピーに失敗しました',
+          description: 'クリップボードへのアクセスが許可されていません',
+          duration: 3000,
+        });
+      });
+  };
 
   // 招待の削除
   const handleDeleteInvitation = async (id: string) => {
@@ -60,8 +91,11 @@ export function InvitationsTable({ invitations }: InvitationsTableProps) {
           title: '招待を削除しました',
           description: '招待が正常に削除されました',
         });
-        // 画面リフレッシュ（理想的にはSWRやReact Queryなどでキャッシュ更新）
-        window.location.reload();
+
+        // 削除後のコールバックを呼び出す
+        if (onInvitationDeleted) {
+          onInvitationDeleted(id);
+        }
       } else {
         const error = await response.json();
         throw new Error(error.error || '削除に失敗しました');
@@ -116,6 +150,7 @@ export function InvitationsTable({ invitations }: InvitationsTableProps) {
             <TableHead>状態</TableHead>
             <TableHead>招待日</TableHead>
             <TableHead>期限</TableHead>
+            <TableHead>招待リンク</TableHead>
             <TableHead>操作</TableHead>
           </TableRow>
         </TableHeader>
@@ -127,6 +162,27 @@ export function InvitationsTable({ invitations }: InvitationsTableProps) {
               <TableCell>{getStatusBadge(invitation)}</TableCell>
               <TableCell>{invitation.createdAtFormatted}</TableCell>
               <TableCell>{invitation.expiresFormatted}</TableCell>
+              <TableCell>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full max-w-xs truncate"
+                  onClick={() =>
+                    copyInviteLink(invitation.inviteUrl, invitation.id)
+                  }
+                  disabled={invitation.used}
+                  title="クリックでコピー"
+                >
+                  {copiedLinkId === invitation.id ? (
+                    <Icons.check className="mr-1 size-3" />
+                  ) : (
+                    <Icons.copy className="mr-1 size-3" />
+                  )}
+                  {invitation.inviteUrl.length > 30
+                    ? `${invitation.inviteUrl.substring(0, 15)}...${invitation.inviteUrl.substring(invitation.inviteUrl.length - 15)}`
+                    : invitation.inviteUrl}
+                </Button>
+              </TableCell>
               <TableCell>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>

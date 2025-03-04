@@ -27,19 +27,29 @@ export async function createInvitation(
   });
 
   if (existingUser) {
-    throw new Error('User with this email already exists');
+    throw new Error('このメールアドレスは既に登録されているユーザーです');
   }
 
   // Auth0側でのユーザー存在チェック
   const existsInAuth0 = await userExistsByEmail(email);
   if (existsInAuth0) {
-    throw new Error('User with this email already exists in Auth0');
+    throw new Error('このメールアドレスは既に認証システムに登録されています');
   }
 
-  // 既存の招待がある場合は削除（再招待の場合）
-  await prisma.invitation.deleteMany({
-    where: { email },
+  // 既存の招待がないかチェック
+  const existingInvitation = await prisma.invitation.findFirst({
+    where: {
+      email,
+      used: false, // 未使用の招待のみ
+      expires: {
+        gt: new Date(), // 期限が切れていない招待のみ
+      },
+    },
   });
+
+  if (existingInvitation) {
+    throw new Error('このメールアドレスへの有効な招待が既に存在します');
+  }
 
   // 新しい招待を作成
   const token = generateInvitationToken();
@@ -113,10 +123,24 @@ export async function acceptInvitation(
     // Auth0ユーザーの作成
     await createAuth0User(invitation.email, invitation.role);
 
-    // 招待を使用済みとしてマーク
-    await prisma.invitation.update({
-      where: { id: invitation.id },
-      data: { used: true },
+    // トランザクションでローカルデータベースの操作を実行
+    // これにより、すべての操作が成功するか、すべての操作が失敗するかのどちらかになる
+    await prisma.$transaction(async (tx) => {
+      // ローカルデータベースにユーザーを作成
+      await tx.user.create({
+        data: {
+          name: invitation.email.split('@')[0], // 仮の表示名（メールアドレスの@前の部分）
+          email: invitation.email,
+          emailVerified: new Date(), // メール検証済みとしてマーク
+          role: invitation.role,
+        },
+      });
+
+      // 招待を使用済みとしてマーク
+      await tx.invitation.update({
+        where: { id: invitation.id },
+        data: { used: true },
+      });
     });
 
     return {

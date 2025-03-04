@@ -43,7 +43,11 @@ const inviteUserSchema = z.object({
 
 type InviteUserFormValues = z.infer<typeof inviteUserSchema>;
 
-export function InviteUserForm() {
+interface InviteUserFormProps {
+  onInvitationCreated?: () => void;
+}
+
+export function InviteUserForm({ onInvitationCreated }: InviteUserFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // フォーム定義
@@ -76,12 +80,33 @@ export function InviteUserForm() {
           description: `${data.email}宛に招待メールを送信しました`,
         });
         form.reset();
+
+        // 招待作成後にコールバックを呼び出す
+        if (onInvitationCreated) {
+          onInvitationCreated();
+        }
       } else {
-        toast({
-          variant: 'destructive',
-          title: '招待の送信に失敗しました',
-          description: result.error || '不明なエラーが発生しました',
-        });
+        // エラーメッセージをユーザーフレンドリーに整形
+        const errorMessage = result.error || '不明なエラーが発生しました';
+
+        // 既存ユーザーエラーの場合は特別な表示
+        if (
+          errorMessage.includes('既に登録されているユーザー') ||
+          errorMessage.includes('既に認証システムに登録されています') ||
+          errorMessage.includes('有効な招待が既に存在します')
+        ) {
+          toast({
+            variant: 'destructive',
+            title: '招待できないユーザー',
+            description: errorMessage,
+          });
+        } else {
+          toast({
+            variant: 'destructive',
+            title: '招待の送信に失敗しました',
+            description: errorMessage,
+          });
+        }
       }
     } catch (error) {
       console.error('Error sending invitation:', error);

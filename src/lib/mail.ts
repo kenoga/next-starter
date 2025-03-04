@@ -4,8 +4,10 @@ import sgMail from '@sendgrid/mail';
 import InvitationEmail from '@/emails/invitation-email';
 import { env } from '@/env.mjs';
 
-// SendGridのAPIキーを設定
-sgMail.setApiKey(env.SENDGRID_API_KEY);
+// SendGridのAPIキーを設定（メール送信スキップが有効でない場合のみ）
+if (env.SKIP_EMAIL_SENDING !== 'true') {
+  sgMail.setApiKey(env.SENDGRID_API_KEY);
+}
 
 interface SendMailOptions {
   to: string;
@@ -28,6 +30,16 @@ export async function sendMail({
     html,
   };
 
+  // ローカル環境でのメール送信をスキップする
+  if (env.SKIP_EMAIL_SENDING === 'true' || env.NODE_ENV === 'development') {
+    console.log('========== MAIL SENDING SKIPPED IN DEVELOPMENT ==========');
+    console.log(`To: ${to}`);
+    console.log(`Subject: ${subject}`);
+    console.log(`Content: ${html.substring(0, 500)}...`);
+    console.log('==========================================================');
+    return;
+  }
+
   try {
     await sgMail.send(msg);
   } catch (error) {
@@ -39,15 +51,15 @@ export async function sendMail({
 /**
  * 招待メールを送信する
  */
-export function sendInvitationEmail(
+export async function sendInvitationEmail(
   email: string,
   inviteUrl: string,
   role: string
 ): Promise<void> {
-  const subject = '【Next Starter】サービス招待のお知らせ';
+  const subject = `【${env.APP_NAME}】サービス招待のお知らせ`;
 
   // React EmailコンポーネントをレンダリングしてHTML文字列に変換
-  const emailHtml = render(InvitationEmail({ inviteUrl, role }));
+  const emailHtml = await render(InvitationEmail({ inviteUrl, role }));
 
   return sendMail({ to: email, subject, html: emailHtml });
 }

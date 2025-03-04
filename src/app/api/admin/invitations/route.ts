@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { auth } from '@/app/api/auth/[...nextauth]/auth-options';
+import { env } from '@/env.mjs';
 import { withAdmin } from '@/lib/auth';
 import { createInvitation } from '@/lib/invitations';
 import prisma from '@/lib/prisma';
@@ -13,15 +14,36 @@ const invitationSchema = z.object({
 });
 
 /**
- * 招待一覧を取得する
+ * 招待一覧を取得する（招待者情報も含む）
  */
 export async function GET(request: NextRequest) {
   return withAdmin(request, async () => {
+    // 招待リストの取得
     const invitations = await prisma.invitation.findMany({
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json(invitations);
+    // 招待ユーザーごとに招待者の情報と招待リンクを取得
+    const invitationsWithDetails = await Promise.all(
+      invitations.map(async (invitation) => {
+        const inviter = await prisma.user.findUnique({
+          where: { id: invitation.invitedBy },
+          select: { name: true, email: true },
+        });
+
+        // 招待リンクの作成
+        const inviteUrl = `${env.APP_URL}/invite?token=${invitation.token}`;
+
+        return {
+          ...invitation,
+          inviterName: inviter?.name || '',
+          inviterEmail: inviter?.email || '',
+          inviteUrl, // 招待リンクを追加
+        };
+      })
+    );
+
+    return NextResponse.json(invitationsWithDetails);
   });
 }
 

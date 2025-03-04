@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { Icons } from '@/components/icons';
@@ -13,38 +13,28 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { env } from '@/env.mjs';
 
 interface InvitationData {
   valid: boolean;
   email?: string;
   role?: string;
   message?: string;
+  invitation?: any;
 }
 
-export default function InvitationConfirmation({ token }: { token: string }) {
+interface InvitationConfirmationProps {
+  token: string;
+  initialValidation: InvitationData;
+}
+
+export default function InvitationConfirmation({
+  token,
+  initialValidation,
+}: InvitationConfirmationProps) {
   const router = useRouter();
-  const [invitation, setInvitation] = useState<InvitationData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isAccepting, setIsAccepting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // 招待トークンの検証
-  useEffect(() => {
-    async function verifyInvitation() {
-      try {
-        const response = await fetch(`/api/invitations/verify?token=${token}`);
-        const data = await response.json();
-        setInvitation(data);
-      } catch (err) {
-        setError('招待情報の取得中にエラーが発生しました。');
-        console.error('Error verifying invitation:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    verifyInvitation();
-  }, [token]);
 
   // 招待の受諾
   const handleAcceptInvitation = async () => {
@@ -75,24 +65,10 @@ export default function InvitationConfirmation({ token }: { token: string }) {
     }
   };
 
-  // ローディング中
-  if (isLoading) {
-    return (
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle>招待を確認中...</CardTitle>
-          <CardDescription>情報を読み込んでいます</CardDescription>
-        </CardHeader>
-        <CardContent className="flex justify-center py-8">
-          <Icons.spinner className="size-8 animate-spin" />
-        </CardContent>
-      </Card>
-    );
-  }
-
   // エラーの場合
-  if (error || !invitation || !invitation.valid) {
-    const errorMessage = error || invitation?.message || '招待が無効です。';
+  if (error || !initialValidation.valid) {
+    const errorMessage =
+      error || initialValidation?.message || '招待が無効です。';
 
     return (
       <Card className="border-destructive w-full max-w-md">
@@ -124,15 +100,18 @@ export default function InvitationConfirmation({ token }: { token: string }) {
           <p className="text-muted-foreground text-sm font-medium">
             メールアドレス
           </p>
-          <p className="font-medium">{invitation.email}</p>
+          <p className="font-medium">{initialValidation.invitation?.email}</p>
         </div>
         <div>
           <p className="text-muted-foreground text-sm font-medium">権限</p>
-          <p className="font-medium capitalize">{invitation.role}</p>
+          <p className="font-medium capitalize">
+            {initialValidation.invitation?.role}
+          </p>
         </div>
         <div className="text-muted-foreground pt-4 text-sm">
           <p>
-            この招待を受け入れると、Next Starterのアカウントが作成されます。
+            この招待を受け入れると、{env.NEXT_PUBLIC_APP_NAME}
+            のアカウントが作成されます。
             パスワード設定用のメールが送信されますので、メールボックスをご確認ください。
           </p>
         </div>

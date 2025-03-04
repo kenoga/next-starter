@@ -1,4 +1,17 @@
+import { randomBytes } from 'crypto';
+
 import { env } from '@/env.mjs';
+
+/**
+ * セキュアなランダムパスワードを生成する
+ * Auth0のパスワード要件を満たす必要がある（通常は8文字以上で英数字記号を含む）
+ */
+function generateRandomPassword(): string {
+  // 16文字のランダムな文字列を生成
+  const randomString = randomBytes(12).toString('base64');
+  // Auth0のパスワード要件を満たすように、大文字、小文字、数字、記号を追加
+  return `A1$${randomString}`;
+}
 
 interface Auth0Token {
   access_token: string;
@@ -69,6 +82,8 @@ export async function createAuth0User(
     },
     body: JSON.stringify({
       email,
+      // ランダムパスワードを生成（実際にはユーザーが後でリセットする）
+      password: generateRandomPassword(),
       connection: 'Username-Password-Authentication',
       email_verified: true,
       app_metadata: {

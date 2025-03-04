@@ -1,6 +1,3 @@
-import { HeroForm } from '@/components/form';
-import { Icons } from '@/components/icons';
-import { Button } from '@/components/ui/button';
 import { messages } from '@/lib/messages';
 
 const Home = () => {
@@ -12,24 +9,6 @@ const Home = () => {
       <p className="text-muted-foreground max-w-2xl">
         {messages.nextjs_starter_template_description}
       </p>
-      <div className="mt-1">
-        <HeroForm />
-      </div>
-      <div className="mt-2 flex gap-4">
-        <Button asChild>
-          <a
-            href="https://github.com/Skolaczk/next-starter/blob/main/README.md#getting-started"
-            target="_blank"
-          >
-            {messages.get_started}
-          </a>
-        </Button>
-        <Button variant="outline" asChild>
-          <a href="https://github.com/Skolaczk/next-starter" target="_blank">
-            <Icons.github className="mr-2 size-4" /> {messages.github}
-          </a>
-        </Button>
-      </div>
     </section>
   );
 };

@@ -1,6 +1,8 @@
+import { env } from '@/env.mjs';
+
 // Hard-coded messages to replace i18n functionality
 export const messages = {
-  app_name: 'Next.js Starter',
+  app_name: env.NEXT_PUBLIC_APP_NAME,
   sign_in: 'Sign in',
   sign_out: 'Sign out',
   light: 'Light',
@@ -19,12 +21,12 @@ export const messages = {
   server_action_success: 'Server action succeeded!',
   server_action_error: 'Server action failed.',
   github: 'GitHub',
-  nextjs_starter_template_headline: 'Next.js Starter Template',
+  nextjs_starter_template_headline: env.NEXT_PUBLIC_APP_NAME,
   nextjs_starter_template_description:
     'A starter template for Next.js with TypeScript, Tailwind CSS, and more.',
   input_placeholder: 'Enter your name',
   submit_form: 'Submit',
-  meta_title: 'Next.js Starter Template',
+  meta_title: env.NEXT_PUBLIC_APP_NAME,
   meta_description:
     'A starter template for Next.js with TypeScript, Tailwind CSS, and more.',
   my_account: 'My Account',
@@ -35,7 +37,7 @@ export const messages = {
 export const seoKeywords = [
   'Next.js',
   'React',
-  'Next.js Starter',
+  env.NEXT_PUBLIC_APP_NAME,
   'Next.js Boilerplate',
   'Starter Template',
   'TailwindCSS',

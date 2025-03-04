@@ -12,13 +12,15 @@ import {
   Text,
 } from '@react-email/components';
 
+import { env } from '@/env.mjs';
+
 interface InvitationEmailProps {
   inviteUrl: string;
   role: string;
 }
 
 export const InvitationEmail = ({ inviteUrl, role }: InvitationEmailProps) => {
-  const previewText = 'Next Starterへのご招待';
+  const previewText = `${env.NEXT_PUBLIC_APP_NAME}へのご招待`;
 
   return (
     <Html>
@@ -26,8 +28,12 @@ export const InvitationEmail = ({ inviteUrl, role }: InvitationEmailProps) => {
       <Preview>{previewText}</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Heading style={h1}>Next Starterへのご招待</Heading>
-          <Text style={text}>このたびは Next Starter へご招待いたします。</Text>
+          <Heading
+            style={h1}
+          >{`${env.NEXT_PUBLIC_APP_NAME}へのご招待`}</Heading>
+          <Text
+            style={text}
+          >{`このたびは ${env.NEXT_PUBLIC_APP_NAME} へご招待いたします。`}</Text>
           <Text style={text}>
             あなたは「{role}」権限でサービスにご招待されました。
           </Text>
@@ -35,7 +41,16 @@ export const InvitationEmail = ({ inviteUrl, role }: InvitationEmailProps) => {
             下記リンクをクリックして招待を承認してください：
           </Text>
           <Section style={buttonContainer}>
-            <Button pX={20} pY={12} style={button} href={inviteUrl}>
+            <Button
+              style={{
+                ...button,
+                paddingLeft: '20px',
+                paddingRight: '20px',
+                paddingTop: '12px',
+                paddingBottom: '12px',
+              }}
+              href={inviteUrl}
+            >
               招待を承認する
             </Button>
           </Section>

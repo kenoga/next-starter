@@ -1,14 +1,4 @@
-<a href="https://next-starter-skolaczk.vercel.app/">
-<img src="https://github.com/Skolaczk/next-starter/assets/76774237/44b552ff-43aa-441f-b1d0-de9bdfc2a73f" alt="thubnail">
-</a>
-<p align="center">
-  <a href="#-features"><strong>Features</strong></a> ·
-  <a href="#-deployment"><strong>Deployment</strong></a> ·
-  <a href="#-getting-started"><strong>Getting started</strong></a> ·
-  <a href="#%EF%B8%8F-scripts-overview"><strong>Scripts overview</strong></a> ·
-  <a href="#-contribution"><strong>Contribution</strong></a> ·
-  <a href="#%EF%B8%8F-support"><strong>Support</strong></a>
-</p>
+# Next.js Starter Template
 
 ## 🎉 Features
 - 🚀 Next.js 15 (App router)
@@ -40,28 +30,11 @@
 - 🌐 I18n with Paraglide
 
 ## 🚀 Deployment
-Easily deploy your Next.js app with <a href="https://vercel.com/">Vercel</a> by clicking the button below:
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Skolaczk/next-starter)
+Easily deploy your Next.js app with <a href="https://vercel.com/">Vercel</a>.
 
 ## 🎯 Getting started
-### 1. Clone this template in one of three ways
+### 1. Clone this repository
 
-1. Using this repository as template
-
-   ![use-this-template-button](https://github.com/Skolaczk/next-starter/assets/76774237/f25c9a29-41de-4865-aa38-c032b9346169)
-
-2. Using `create-next-app`
-
-   ```bash
-   npx create-next-app -e https://github.com/Skolaczk/next-starter my-project-name
-   ```
-    
-3. Using `git clone`
-
-   ```bash
-   git clone https://github.com/Skolaczk/next-starter my-project-name
-   ```
 ### 2. Install dependencies
 
 ```bash
@@ -92,6 +65,12 @@ Required variables for all features:
 - `AUTH0_ISSUER`: Auth0 issuer URL (for Auth0 Management API)
 - `SENDGRID_API_KEY`: SendGrid API key (for sending invitation emails)
 - `SENDGRID_FROM_EMAIL`: Verified sender email for SendGrid
+- `APP_NAME`: アプリケーション名（サーバーサイド）
+- `NEXT_PUBLIC_APP_NAME`: アプリケーション名（クライアントサイド）
+
+開発環境では、以下の設定でメール送信をスキップできます：
+- `SKIP_EMAIL_SENDING=true`: メール送信処理をスキップし、コンソールに内容を表示
+- または、`NODE_ENV=development`の場合は自動的にスキップされます
 
 ### 5. Run Prisma migrations
 ```bash
@@ -166,17 +145,3 @@ The following scripts are available in the `package.json`:
 - `email:dev`: Start email template preview server
 - `postbuild`: Generate sitemap
 - `prepare`: Install Husky for managing Git hooks
-
-## 🤝 Contribution
-To contribute, please follow these steps:
-1. Fork the repository.
-2. Create a new branch.
-3. Make your changes, and commit them.
-4. Push your changes to the forked repository.
-5. Create a pull request.
-
-## ❤️ Support
-
-If you liked the project, I will appreciate if you leave a star. 🌟😊
-
-Made by <a href="https://michalskolak.netlify.app/">Michał Skolak</a> 
