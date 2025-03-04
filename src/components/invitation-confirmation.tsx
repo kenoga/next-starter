@@ -36,26 +36,21 @@ export default function InvitationConfirmation({
   const [isAccepting, setIsAccepting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 招待の受諾
+  // 招待の受諾 - Server Actionを使用
   const handleAcceptInvitation = async () => {
     setIsAccepting(true);
     setError(null);
 
     try {
-      const response = await fetch('/api/invitations/accept', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token }),
-      });
+      const { acceptInvitationAction } = await import(
+        '@/actions/invitations/accept'
+      );
+      const result = await acceptInvitationAction(token);
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
+      if (result.success) {
         router.push('/invite/success');
       } else {
-        setError(data.message || '招待の受諾中にエラーが発生しました。');
+        setError(result.message || '招待の受諾中にエラーが発生しました。');
       }
     } catch (err) {
       setError('招待の受諾中にエラーが発生しました。');

@@ -78,15 +78,16 @@ export function InvitationsTable({
       });
   };
 
-  // 招待の削除
+  // 招待の削除 - Server Actionを使用
   const handleDeleteInvitation = async (id: string) => {
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/admin/invitations/${id}`, {
-        method: 'DELETE',
-      });
+      const { deleteInvitationAction } = await import(
+        '@/actions/admin/invitations/delete'
+      );
+      const result = await deleteInvitationAction(id);
 
-      if (response.ok) {
+      if (result.success) {
         toast({
           title: '招待を削除しました',
           description: '招待が正常に削除されました',
@@ -97,8 +98,7 @@ export function InvitationsTable({
           onInvitationDeleted(id);
         }
       } else {
-        const error = await response.json();
-        throw new Error(error.error || '削除に失敗しました');
+        throw new Error(result.message || '削除に失敗しました');
       }
     } catch (error) {
       console.error('Error deleting invitation:', error);

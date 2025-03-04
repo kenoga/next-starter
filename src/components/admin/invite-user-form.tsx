@@ -59,22 +59,17 @@ export function InviteUserForm({ onInvitationCreated }: InviteUserFormProps) {
     },
   });
 
-  // フォーム送信処理
+  // フォーム送信処理 - Server Actionを使用
   async function onSubmit(data: InviteUserFormValues) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/admin/invitations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+      const { createInvitationAction } = await import(
+        '@/actions/admin/invitations/create'
+      );
+      const result = await createInvitationAction(data.email, data.role);
 
-      const result = await response.json();
-
-      if (response.ok) {
+      if (result.success) {
         toast({
           title: '招待メールを送信しました',
           description: `${data.email}宛に招待メールを送信しました`,
@@ -87,7 +82,7 @@ export function InviteUserForm({ onInvitationCreated }: InviteUserFormProps) {
         }
       } else {
         // エラーメッセージをユーザーフレンドリーに整形
-        const errorMessage = result.error || '不明なエラーが発生しました';
+        const errorMessage = result.message || '不明なエラーが発生しました';
 
         // 既存ユーザーエラーの場合は特別な表示
         if (
