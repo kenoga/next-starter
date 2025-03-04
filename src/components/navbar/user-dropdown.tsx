@@ -20,13 +20,14 @@ import { messages } from '@/lib/messages';
 export const UserDropdown = ({ session: { user } }: { session: Session }) => {
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // ユーザーの管理者権限を確認
+  // ユーザーの管理者権限を確認 - Server Actionを使用
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
-        const response = await fetch('/api/users/me');
-        if (response.ok) {
-          const userData = await response.json();
+        const { getCurrentUserAction } = await import('@/actions/users/me');
+        const userData = await getCurrentUserAction();
+
+        if (!('error' in userData)) {
           setIsAdmin(userData.role === 'admin');
         }
       } catch (error) {

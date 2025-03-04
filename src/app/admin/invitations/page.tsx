@@ -27,23 +27,25 @@ export default function AdminInvitationsPage() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
 
-  // 招待リストを取得する関数
+  // 招待リストを取得する関数 - Server Actionを使用
   const fetchInvitations = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/admin/invitations');
-      if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
+      const { getInvitationsAction } = await import(
+        '@/actions/admin/invitations/list'
+      );
+      const result = await getInvitationsAction();
+
+      if ('error' in result) {
+        if (result.status === 401 || result.status === 403) {
           setIsAuthorized(false);
           return;
         }
         throw new Error('招待リストの取得に失敗しました');
       }
 
-      const data = await response.json();
-
       // 日付のフォーマットと招待者の情報を追加
-      const formattedInvitations = data.map((invitation: any) => ({
+      const formattedInvitations = result.map((invitation) => ({
         ...invitation,
         expires: new Date(invitation.expires),
         createdAt: new Date(invitation.createdAt),
