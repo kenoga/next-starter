@@ -2,6 +2,8 @@ import { generatePasswordChangeTicket } from './auth0';
 import { sendPasswordResetEmail } from './mail';
 import prisma from './prisma';
 
+import { env } from '@/env.mjs';
+
 /**
  * ユーザー作成後にパスワード設定用メールを送信する
  * @param userId Auth0のユーザーID
@@ -14,9 +16,10 @@ export async function sendPasswordSetupEmail(
   name?: string
 ): Promise<void> {
   try {
-    // Auth0からパスワード変更URLを取得（パスワード設定後はログインページへリダイレクト）
-    // 明示的にリダイレクト先を指定
-    const resultUrl = `${process.env.APP_URL}/api/auth/signin`;
+    // Auth0からパスワード変更URLを取得（パスワード設定後はAuth0のユニバーサルログインページへリダイレクト）
+    // Auth0のログインページURL形式で明示的にリダイレクト先を指定
+    const domain = env.AUTH0_ISSUER.replace('https://', '');
+    const resultUrl = `https://${domain}/authorize?client_id=${env.AUTH0_CLIENT_ID}&redirect_uri=${encodeURIComponent(env.APP_URL)}&response_type=code&scope=openid%20profile%20email`;
     const resetUrl = await generatePasswordChangeTicket(userId, resultUrl);
 
     console.log('Password reset URL:', resetUrl);
